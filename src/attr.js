@@ -2,7 +2,9 @@ export default function attr(element, name, value) {
     if (typeof name === 'object') {
         return Object.keys(name).forEach((key) => attr(element, key, name[key]));
     }
-    if (name === 'class' || name === 'className') {
+    if (value == null || value === false) {
+        element.removeAttribute(name);
+    } else if (name === 'class' || name === 'className') {
         if (Array.isArray(value)) {
             value = value.join(' ');
         }

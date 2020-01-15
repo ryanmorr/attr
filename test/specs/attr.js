@@ -103,4 +103,24 @@ describe('attr', () => {
         attr(element, 'style', {display: ''});
         expect(getStyle(element, 'display')).to.equal(defaultDisplay);
     });
+
+    it('should remove an attribute by providing null, undefined, or false as the value', () => {
+        attr(element, 'foo', 'bar');
+        expect(element.hasAttribute('foo')).to.equal(true);
+
+        attr(element, 'foo', null);
+        expect(element.hasAttribute('foo')).to.equal(false);
+
+        attr(element, 'class', 'baz');
+        expect(element.hasAttribute('class')).to.equal(true);
+
+        attr(element, 'class', undefined);
+        expect(element.hasAttribute('class')).to.equal(false);
+
+        attr(element, 'style', 'width: 10px');
+        expect(element.hasAttribute('style')).to.equal(true);
+
+        attr(element, 'style', false);
+        expect(element.hasAttribute('style')).to.equal(false);
+    });
 });
