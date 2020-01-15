@@ -27,4 +27,20 @@ describe('attr', () => {
         expect(element.getAttribute('foo')).to.equal('bar');
         expect(element.getAttribute('baz')).to.equal('qux');
     });
+
+    it('should set the class attribute', () => {
+        attr(element, 'class', 'foo');
+        expect(element.className).to.equal('foo');
+
+        attr(element, 'className', 'bar')
+        expect(element.className).to.equal('bar');
+    });
+
+    it('should set the class attribute with an array', () => {
+        attr(element, 'class', ['foo', 'bar', 'baz']);
+        expect(element.className).to.equal('foo bar baz');
+
+        attr(element, 'className', ['a', 'b', 'c', 'd']);
+        expect(element.className).to.equal('a b c d');
+    });
 });
