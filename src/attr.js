@@ -7,6 +7,19 @@ export default function attr(element, name, value) {
             value = value.join(' ');
         }
         element.className = value;
+    } else if (name === 'style') {
+        if (typeof value === 'string') {
+            element.style.cssText = value;
+        } else {
+            for (const key in value) {
+                const style = value[key] == null ? '' : value[key];
+                if (key.includes('-')) {
+                    element.style.setProperty(key, style);
+                } else {
+                    element.style[key] = style;
+                }
+            }
+        }
     } else {
         element.setAttribute(name, value);
     }
