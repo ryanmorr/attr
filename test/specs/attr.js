@@ -253,4 +253,106 @@ describe('attr', () => {
         expect(element.getAttribute('data-foo')).to.equal('true');
         expect(element.getAttribute('data-baz')).to.equal('false');
     });
+
+    it('should support thunks for attributes', () => {
+        const thunk1 = sinon.spy(() => 'bar');
+        attr(element, 'foo', thunk1);
+
+        expect(element.getAttribute('foo')).to.equal('bar');
+        expect(thunk1.callCount).to.equal(1);
+        expect(thunk1.args[0][0]).to.equal(element);
+        expect(thunk1.args[0][1]).to.equal(null);
+
+        const thunk2 = sinon.spy(() => 'baz');
+        attr(element, 'foo', thunk2);
+
+        expect(element.getAttribute('foo')).to.equal('baz');
+        expect(thunk2.callCount).to.equal(1);
+        expect(thunk2.args[0][0]).to.equal(element);
+        expect(thunk2.args[0][1]).to.equal('bar');
+    });
+
+    it('should support thunks for classes', () => {
+        const thunk1 = sinon.spy(() => 'bar');
+        attr(element, 'class', thunk1);
+
+        expect(element.getAttribute('class')).to.equal('bar');
+        expect(thunk1.callCount).to.equal(1);
+        expect(thunk1.args[0][0]).to.equal(element);
+        expect(thunk1.args[0][1]).to.equal('');
+
+        const thunk2 = sinon.spy(() => 'baz');
+        attr(element, 'class', thunk2);
+
+        expect(element.getAttribute('class')).to.equal('baz');
+        expect(thunk2.callCount).to.equal(1);
+        expect(thunk2.args[0][0]).to.equal(element);
+        expect(thunk2.args[0][1]).to.equal('bar');
+    });
+
+    it('should support thunks for styles as a string', () => {
+        const thunk1 = sinon.spy(() => 'width: 1px; height: 1px;');
+        attr(element, 'style', thunk1);
+
+        expect(element.getAttribute('style')).to.equal('width: 1px; height: 1px;');
+        expect(thunk1.callCount).to.equal(1);
+        expect(thunk1.args[0][0]).to.equal(element);
+        expect(thunk1.args[0][1]).to.deep.equal({});
+
+        const thunk2 = sinon.spy(() => 'width: 2px; height: 2px;');
+        attr(element, 'style', thunk2);
+
+        expect(element.getAttribute('style')).to.equal('width: 2px; height: 2px;');
+        expect(thunk2.callCount).to.equal(1);
+        expect(thunk2.args[0][0]).to.equal(element);
+        expect(thunk2.args[0][1]).to.deep.equal({width: '1px', height: '1px'});
+    });
+
+    it('should support thunks for styles as a key/value map', () => {
+        const thunk1 = sinon.spy(() => {
+            return {width: '1px', height: '1px'};
+        });
+        attr(element, 'style', thunk1);
+
+        expect(element.getAttribute('style')).to.equal('width: 1px; height: 1px;');
+        expect(thunk1.callCount).to.equal(1);
+        expect(thunk1.args[0][0]).to.equal(element);
+        expect(thunk1.args[0][1]).to.deep.equal({});
+
+        const thunk2 = sinon.spy(() => {
+            return {width: '2px', height: '2px'};
+        });
+        attr(element, 'style', thunk2);
+
+        expect(element.getAttribute('style')).to.equal('width: 2px; height: 2px;');
+        expect(thunk2.callCount).to.equal(1);
+        expect(thunk2.args[0][0]).to.equal(element);
+        expect(thunk2.args[0][1]).to.deep.equal({width: '1px', height: '1px'});
+    });
+
+    it('should support thunks for dataset', () => {
+        const thunk1 = sinon.spy(() => {
+            return {foo: 'a', bar: 'b', baz: 'c'};
+        });
+        attr(element, 'dataset', thunk1);
+
+        expect(element.getAttribute('data-foo')).to.equal('a');
+        expect(element.getAttribute('data-bar')).to.equal('b');
+        expect(element.getAttribute('data-baz')).to.equal('c');
+        expect(thunk1.callCount).to.equal(1);
+        expect(thunk1.args[0][0]).to.equal(element);
+        expect(thunk1.args[0][1]).to.deep.equal({});
+
+        const thunk2 = sinon.spy(() => {
+            return {foo: 'x', bar: 'y', baz: 'z'};
+        });
+        attr(element, 'dataset', thunk2);
+
+        expect(element.getAttribute('data-foo')).to.equal('x');
+        expect(element.getAttribute('data-bar')).to.equal('y');
+        expect(element.getAttribute('data-baz')).to.equal('z');
+        expect(thunk2.callCount).to.equal(1);
+        expect(thunk2.args[0][0]).to.equal(element);
+        expect(thunk2.args[0][1]).to.deep.equal({foo: 'a', bar: 'b', baz: 'c'});
+    });
 });
