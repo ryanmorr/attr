@@ -48,6 +48,26 @@ describe('attr', () => {
         expect(element.className).to.equal('a b c d');
     });
 
+    it('should remove an attribute by providing null, undefined, or false as the value', () => {
+        attr(element, 'foo', 'bar');
+        expect(element.hasAttribute('foo')).to.equal(true);
+
+        attr(element, 'foo', null);
+        expect(element.hasAttribute('foo')).to.equal(false);
+
+        attr(element, 'class', 'baz');
+        expect(element.hasAttribute('class')).to.equal(true);
+
+        attr(element, 'class', undefined);
+        expect(element.hasAttribute('class')).to.equal(false);
+
+        attr(element, 'style', 'width: 10px');
+        expect(element.hasAttribute('style')).to.equal(true);
+
+        attr(element, 'style', false);
+        expect(element.hasAttribute('style')).to.equal(false);
+    });
+
     it('should set a boolean attribute to true', () => {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -155,26 +175,6 @@ describe('attr', () => {
         expect(getStyle(element, 'display')).to.equal(defaultDisplay);
     });
 
-    it('should remove an attribute by providing null, undefined, or false as the value', () => {
-        attr(element, 'foo', 'bar');
-        expect(element.hasAttribute('foo')).to.equal(true);
-
-        attr(element, 'foo', null);
-        expect(element.hasAttribute('foo')).to.equal(false);
-
-        attr(element, 'class', 'baz');
-        expect(element.hasAttribute('class')).to.equal(true);
-
-        attr(element, 'class', undefined);
-        expect(element.hasAttribute('class')).to.equal(false);
-
-        attr(element, 'style', 'width: 10px');
-        expect(element.hasAttribute('style')).to.equal(true);
-
-        attr(element, 'style', false);
-        expect(element.hasAttribute('style')).to.equal(false);
-    });
-
     it('should add an event listener', (done) => {
         const event = new MouseEvent('click');
         const onClick = (e) => {
@@ -195,5 +195,62 @@ describe('attr', () => {
 
         attr(element, 'onMouseOver', onMouseOver);
         element.dispatchEvent(event);
+    });
+
+    it('should set a data attribute', () => {
+        attr(element, 'data-foo', 'bar');
+
+        expect(element.dataset.foo).to.equal('bar');
+        expect(element.getAttribute('data-foo')).to.equal('bar');
+    });
+
+    it('should set dataset', () => {
+        attr(element, 'dataset', {
+            foo: 'bar',
+            baz: 'qux'
+        });
+
+        expect(element.dataset.foo).to.equal('bar');
+        expect(element.dataset.baz).to.equal('qux');
+        expect(element.getAttribute('data-foo')).to.equal('bar');
+        expect(element.getAttribute('data-baz')).to.equal('qux');
+    });
+
+    it('should remove from dataset by providing null or undefined as the value', () => {
+        attr(element, 'dataset', {
+            foo: 'a',
+            bar: 'b',
+            baz: 'c',
+            qux: 'd'
+        });
+
+        expect(element.dataset.foo).to.equal('a');
+        expect(element.getAttribute('data-foo')).to.equal('a');
+
+        attr(element, 'dataset', {
+            foo: null,
+        });
+
+        expect(element.dataset.foo).to.equal(undefined);
+        expect(element.hasAttribute('data-foo')).to.equal(false);
+
+        attr(element, 'dataset', {
+            bar: undefined,
+        });
+
+        expect(element.dataset.bar).to.equal(undefined);
+        expect(element.hasAttribute('data-bar')).to.equal(false);
+    });
+
+    it('should convert a boolean value to string for dataset', () => {
+        attr(element, 'dataset', {
+            foo: true,
+            baz: false
+        });
+
+        expect(element.dataset.foo).to.equal('true');
+        expect(element.dataset.baz).to.equal('false');
+        expect(element.getAttribute('data-foo')).to.equal('true');
+        expect(element.getAttribute('data-baz')).to.equal('false');
     });
 });

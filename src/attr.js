@@ -25,6 +25,15 @@ export default function attr(element, name, value) {
                 }
             }
         }
+    } else if (name === 'dataset') {
+        for (const key in value) {
+            const data = value[key];
+            if (data == null && key in element.dataset) {
+                delete element.dataset[key]
+            } else {
+                element.dataset[key] = value[key];
+            }
+        }
     } else if (name.startsWith('on')) {
         element.addEventListener(name.slice(2).toLowerCase(), value);
     } else if (name in element) {
