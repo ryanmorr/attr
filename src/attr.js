@@ -25,6 +25,8 @@ export default function attr(element, name, value) {
                 }
             }
         }
+    } else if (name.startsWith('on')) {
+        element.addEventListener(name.slice(2).toLowerCase(), value);
     } else if (name in element) {
         element[name] = value;
     } else {

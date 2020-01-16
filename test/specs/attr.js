@@ -174,4 +174,26 @@ describe('attr', () => {
         attr(element, 'style', false);
         expect(element.hasAttribute('style')).to.equal(false);
     });
+
+    it('should add an event listener', (done) => {
+        const event = new MouseEvent('click');
+        const onClick = (e) => {
+            expect(e).to.equal(event);
+            done();
+        };
+
+        attr(element, 'onclick', onClick);
+        element.dispatchEvent(event);
+    });
+
+    it('should support camel-cased event names', (done) => {
+        const event = new MouseEvent('mouseover');
+        const onMouseOver = (e) => {
+            expect(e).to.equal(event);
+            done();
+        };
+
+        attr(element, 'onMouseOver', onMouseOver);
+        element.dispatchEvent(event);
+    });
 });
