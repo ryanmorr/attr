@@ -48,6 +48,57 @@ describe('attr', () => {
         expect(element.className).to.equal('a b c d');
     });
 
+    it('should set a boolean attribute to true', () => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = false;
+
+        expect(checkbox.checked).to.equal(false);
+        attr(checkbox, 'checked', true);
+        expect(checkbox.checked).to.equal(true);
+
+        expect(checkbox.disabled).to.equal(false);
+        attr(checkbox, 'disabled', true);
+        expect(checkbox.disabled).to.equal(true);
+    });
+
+    it('should remove a boolean attribute by providing null, undefined, or false as the value', () => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+
+        checkbox.checked = true;
+        attr(checkbox, 'checked', false);
+        expect(checkbox.checked).to.equal(false);
+
+        checkbox.checked = true;
+        attr(checkbox, 'checked', null);
+        expect(checkbox.checked).to.equal(false);
+
+        checkbox.checked = true;
+        attr(checkbox, 'checked', undefined);
+        expect(checkbox.checked).to.equal(false);
+    });
+
+    it('should set a property', () => {
+        const input = document.createElement('input');
+
+        attr(input, 'value', 'foo');
+        expect(input.value).to.equal('foo');
+    });
+
+    it('should unset a property by providing null or undefined as the value', () => {
+        const input = document.createElement('input');
+
+        attr(input, 'value', null);
+        expect(input.value).to.equal('');
+
+        attr(input, 'value', 'foo');
+        expect(input.value).to.equal('foo');
+
+        attr(input, 'value', undefined);
+        expect(input.value).to.equal('');
+    });
+
     it('should set CSS styles as a string', () => {
         attr(element, 'style', 'width: 32px; height: 21px');
 

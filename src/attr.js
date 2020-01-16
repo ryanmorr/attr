@@ -3,6 +3,9 @@ export default function attr(element, name, value) {
         return Object.keys(name).forEach((key) => attr(element, key, name[key]));
     }
     if (value == null || value === false) {
+        if (name in element) {
+            element[name] = '';
+        }
         element.removeAttribute(name);
     } else if (name === 'class' || name === 'className') {
         if (Array.isArray(value)) {
@@ -22,6 +25,8 @@ export default function attr(element, name, value) {
                 }
             }
         }
+    } else if (name in element) {
+        element[name] = value;
     } else {
         element.setAttribute(name, value);
     }
