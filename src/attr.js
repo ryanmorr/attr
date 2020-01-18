@@ -3,9 +3,9 @@ function getAttribute(element, name) {
         return element.className;
     }
     if (name === 'style') {
-        return element.style.cssText.split(';').reduce((styles, item) => {
-            if (item) {
-                const parts = item.split(':');
+        return element.style.cssText.split(';').reduce((styles, style) => {
+            if (style) {
+                const parts = style.split(':');
                 styles[parts[0].trim()] = parts[1].trim();
             }
             return styles;
@@ -28,20 +28,19 @@ export default function attr(element, name, value) {
     if (typeof name === 'object') {
         return Object.keys(name).forEach((key) => attr(element, key, name[key]));
     }
-    if (value == null || value === false) {
-        if (name in element) {
-            element[name] = '';
-        }
-        element.removeAttribute(name);
-        return;
-    } else if (name.startsWith('on')) {
+    if (name.startsWith('on')) {
         element.addEventListener(name.slice(2).toLowerCase(), value);
         return;
     }
     if (typeof value === 'function') {
         value = value(element, getAttribute(element, name));
     }
-    if (name === 'class' || name === 'className') {
+    if (value == null || value === false) {
+        if (name in element) {
+            element[name] = '';
+        }
+        element.removeAttribute(name);
+    } else if (name === 'class' || name === 'className') {
         if (Array.isArray(value)) {
             value = value.join(' ');
         }

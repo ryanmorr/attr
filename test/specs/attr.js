@@ -355,4 +355,36 @@ describe('attr', () => {
         expect(thunk2.args[0][0]).to.equal(element);
         expect(thunk2.args[0][1]).to.deep.equal({foo: 'a', bar: 'b', baz: 'c'});
     });
+
+    it('should support thunks to remove an attribute', () => {
+        attr(element, 'foo', 'bar');
+        expect(element.hasAttribute('foo')).to.equal(true);
+
+        const thunk1 = sinon.spy(() => null);
+        attr(element, 'foo', thunk1);
+        expect(element.hasAttribute('foo')).to.equal(false);
+        expect(thunk1.callCount).to.equal(1);
+        expect(thunk1.args[0][0]).to.equal(element);
+        expect(thunk1.args[0][1]).to.equal('bar');
+
+        attr(element, 'class', 'baz');
+        expect(element.hasAttribute('class')).to.equal(true);
+
+        const thunk2 = sinon.spy(() => undefined);
+        attr(element, 'class', thunk2);
+        expect(element.hasAttribute('class')).to.equal(false);
+        expect(thunk2.callCount).to.equal(1);
+        expect(thunk2.args[0][0]).to.equal(element);
+        expect(thunk2.args[0][1]).to.equal('baz');
+
+        attr(element, 'style', 'width: 10px');
+        expect(element.hasAttribute('style')).to.equal(true);
+
+        const thunk3 = sinon.spy(() => false);
+        attr(element, 'style', thunk3);
+        expect(element.hasAttribute('style')).to.equal(false);
+        expect(thunk3.callCount).to.equal(1);
+        expect(thunk3.args[0][0]).to.equal(element);
+        expect(thunk3.args[0][1]).to.deep.equal({width: '10px'});
+    });
 });
