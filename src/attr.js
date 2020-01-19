@@ -1,6 +1,6 @@
-function getAttribute(element, name) {
+function getCurrentValue(element, name, isSvg) {
     if (name === 'class' || name === 'className') {
-        return element.className;
+        return element.getAttribute('class');
     }
     if (name === 'style') {
         return element.style.cssText.split(';').reduce((styles, style) => {
@@ -18,7 +18,7 @@ function getAttribute(element, name) {
         }
         return data;
     }
-    if (name in element) {
+    if (!isSvg && name in element) {
         return element[name];
     }
     return element.getAttribute(name);
@@ -32,8 +32,9 @@ export default function attr(element, name, value) {
         element.addEventListener(name.slice(2).toLowerCase(), value);
         return;
     }
+    const isSvg = element instanceof SVGElement;
     if (typeof value === 'function') {
-        value = value(element, getAttribute(element, name));
+        value = value(element, getCurrentValue(element, name, isSvg));
     }
     if (value == null || value === false) {
         if (name in element) {
@@ -44,7 +45,11 @@ export default function attr(element, name, value) {
         if (Array.isArray(value)) {
             value = value.join(' ');
         }
-        element.className = value;
+        if (isSvg) {
+            element.setAttribute('class', value);
+        } else {
+            element.className = value;
+        }
     } else if (name === 'style') {
         if (typeof value === 'string') {
             element.style.cssText = value;
@@ -67,7 +72,7 @@ export default function attr(element, name, value) {
                 element.dataset[key] = value[key];
             }
         }
-    } else if (name in element) {
+    } else if (!isSvg && name in element) {
         element[name] = value;
     } else {
         element.setAttribute(name, value);

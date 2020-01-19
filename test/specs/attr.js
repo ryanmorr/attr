@@ -279,7 +279,7 @@ describe('attr', () => {
         expect(element.getAttribute('class')).to.equal('bar');
         expect(thunk1.callCount).to.equal(1);
         expect(thunk1.args[0][0]).to.equal(element);
-        expect(thunk1.args[0][1]).to.equal('');
+        expect(thunk1.args[0][1]).to.equal(null);
 
         const thunk2 = sinon.spy(() => 'baz');
         attr(element, 'class', thunk2);
@@ -386,5 +386,29 @@ describe('attr', () => {
         expect(thunk3.callCount).to.equal(1);
         expect(thunk3.args[0][0]).to.equal(element);
         expect(thunk3.args[0][1]).to.deep.equal({width: '10px'});
+    });
+
+    it('should support SVG elements', () => {
+        const element = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+        attr(element, 'width', 100);
+        attr(element, 'height', 150);
+
+        expect(element.getAttribute('width')).to.equal('100');
+        expect(element.getAttribute('height')).to.equal('150');
+
+        attr(element, 'class', 'foo');
+        expect(element.getAttribute('class')).to.equal('foo');
+
+        const thunk = sinon.spy(() => 'bar');
+        attr(element, 'class', thunk);
+
+        expect(element.getAttribute('class')).to.equal('bar');
+        expect(thunk.callCount).to.equal(1);
+        expect(thunk.args[0][0]).to.equal(element);
+        expect(thunk.args[0][1]).to.equal('foo');
+
+        attr(element, 'class', null);
+        expect(element.hasAttribute('class')).to.equal(false);
     });
 });
