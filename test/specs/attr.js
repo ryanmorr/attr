@@ -524,4 +524,12 @@ describe('attr', () => {
         attr(element, 'class', null);
         expect(element.hasAttribute('class')).to.equal(false);
     });
+
+    it('should support attribute namespaces', () => {
+        const element = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+        expect(element.getAttribute('xlink:href')).to.equal(null);
+        attr(element, 'xlink:href', 'foo')
+        expect(element.getAttribute('xlink:href')).to.equal('foo');
+    });
 });

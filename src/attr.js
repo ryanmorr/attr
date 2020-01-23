@@ -1,4 +1,18 @@
 const JSON_RE = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/;
+const XLINK_NS = 'http://www.w3.org/1999/xlink';
+const XML_NS = 'http://www.w3.org/XML/1998/namespace';
+const NAMESPACES = {
+    'xlink:actuate': XLINK_NS,
+    'xlink:arcrole': XLINK_NS,
+    'xlink:href': XLINK_NS,
+    'xlink:role': XLINK_NS,
+    'xlink:show': XLINK_NS,
+    'xlink:title': XLINK_NS,
+    'xlink:type': XLINK_NS,
+    'xml:base': XML_NS,
+    'xml:lang': XML_NS,
+    'xml:space': XML_NS
+};
 
 function stringifyData(data) {
 	if (typeof data === 'object') {
@@ -95,6 +109,8 @@ export default function attr(element, name, value) {
         element[name] = value == null ? '' : value;
     } else if (value == null || value === false) {
         element.removeAttribute(name);
+    } else if (isSvg && name in NAMESPACES) {
+        element.setAttributeNS(NAMESPACES[name], name, value);
     } else {
         element.setAttribute(name, value);
     }
