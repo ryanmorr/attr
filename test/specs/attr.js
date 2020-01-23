@@ -33,6 +33,22 @@ describe('attr', () => {
         expect(element.getAttribute('baz')).to.equal('qux');
     });
 
+    it('should not set an attribute with a falsy value', () => {
+        attr(element, {
+            a: null,
+            b: undefined,
+            c: false,
+            d: NaN,
+            e: 0
+        });
+
+        expect(element.getAttribute('a')).to.equal(null);
+        expect(element.getAttribute('b')).to.equal(null);
+        expect(element.getAttribute('c')).to.equal(null);
+        expect(element.getAttribute('d')).to.equal('NaN');
+        expect(element.getAttribute('e')).to.equal('0');
+    });
+
     it('should remove an attribute by providing null, undefined, or false as the value', () => {
         attr(element, 'foo', 'a');
         expect(element.hasAttribute('foo')).to.equal(true);
@@ -143,14 +159,20 @@ describe('attr', () => {
     it('should unset a property by providing null or undefined as the value', () => {
         const input = document.createElement('input');
 
+        attr(input, 'value', 0);
+        expect(input.value).to.equal('0');
+
         attr(input, 'value', null);
         expect(input.value).to.equal('');
 
-        attr(input, 'value', 'foo');
-        expect(input.value).to.equal('foo');
+        attr(input, 'value', false);
+        expect(input.value).to.equal('false');
 
         attr(input, 'value', undefined);
         expect(input.value).to.equal('');
+
+        attr(input, 'value', NaN);
+        expect(input.value).to.equal('NaN');
     });
 
     it('should not change the defaultValue of properties', () => {
