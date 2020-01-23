@@ -36,21 +36,10 @@ export default function attr(element, name, value) {
     if (typeof value === 'function') {
         value = value(element, getCurrentValue(element, name, isSvg));
     }
-    if (value == null || value === false) {
-        if (name in element) {
-            element[name] = '';
-        }
-        element.removeAttribute(name);
-    } else if (name === 'class' || name === 'className') {
-        if (Array.isArray(value)) {
-            value = value.join(' ');
-        }
-        if (isSvg) {
-            element.setAttribute('class', value);
-        } else {
-            element.className = value;
-        }
-    } else if (name === 'style') {
+    if ((name === 'class' || name === 'className') && Array.isArray(value)) {
+        value = value.join(' ');
+    }
+    if (name === 'style') {
         if (typeof value === 'string') {
             element.style.cssText = value;
         } else {
@@ -73,7 +62,9 @@ export default function attr(element, name, value) {
             }
         }
     } else if (!isSvg && name in element) {
-        element[name] = value;
+        element[name] = value == null ? '' : value;
+    } else if (value == null || value === false) {
+        element.removeAttribute(name);
     } else {
         element.setAttribute(name, value);
     }
