@@ -1,3 +1,38 @@
+const JSON_RE = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/;
+
+function stringifyData(data) {
+	if (typeof data === 'object') {
+        return JSON.stringify(data);
+	}
+	return data;
+}
+
+function parseData(data) {
+	if (data === 'true') {
+		return true;
+	}
+	if (data === 'false') {
+		return false;
+	}
+	if (data === 'null') {
+		return null;
+    }
+    if (data === 'undefined') {
+		return undefined;
+	}
+	if (data === +data + '') {
+		return +data;
+	}
+	if (JSON_RE.test(data)) {
+        try {
+            return JSON.parse(data);
+        } catch(e) {
+            // eslint-disable no-empty
+        }
+	}
+	return data;
+}
+
 function getCurrentValue(element, name, isSvg) {
     if (name === 'class' || name === 'className') {
         return element.getAttribute('class');
@@ -11,10 +46,10 @@ function getCurrentValue(element, name, isSvg) {
             return styles;
         }, {});
     }
-    if (name === 'dataset') {
+    if (name === 'data') {
         const data = {};
         for (const prop in element.dataset) {
-            data[prop] = element.dataset[prop];
+            data[prop] = parseData(element.dataset[prop]);
         }
         return data;
     }
@@ -52,14 +87,9 @@ export default function attr(element, name, value) {
                 }
             }
         }
-    } else if (name === 'dataset') {
+    } else if (name === 'data') {
         for (const key in value) {
-            const data = value[key];
-            if (data == null && key in element.dataset) {
-                delete element.dataset[key]
-            } else {
-                element.dataset[key] = value[key];
-            }
+            element.dataset[key] = stringifyData(value[key]);
         }
     } else if (!isSvg && name in element) {
         element[name] = value == null ? '' : value;

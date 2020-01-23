@@ -250,54 +250,26 @@ describe('attr', () => {
         expect(element.getAttribute('data-foo')).to.equal('bar');
     });
 
-    it('should set dataset', () => {
-        attr(element, 'dataset', {
-            foo: 'bar',
-            baz: 'qux'
+    it('should set data and convert primitives and objects to strings', () => {
+        attr(element, 'data', {
+            a: 'foo',
+            b: true,
+            c: false,
+            d: 123,
+            e: null,
+            f: undefined,
+            g: {foo: 'bar'},
+            h: [1, 2, 3]
         });
 
-        expect(element.dataset.foo).to.equal('bar');
-        expect(element.getAttribute('data-foo')).to.equal('bar');
-        expect(element.dataset.baz).to.equal('qux');
-        expect(element.getAttribute('data-baz')).to.equal('qux');
-    });
-
-    it('should remove from dataset by providing null or undefined as the value', () => {
-        attr(element, 'dataset', {
-            foo: 'a',
-            bar: 'b',
-            baz: 'c',
-            qux: 'd'
-        });
-
-        expect(element.dataset.foo).to.equal('a');
-        expect(element.getAttribute('data-foo')).to.equal('a');
-
-        attr(element, 'dataset', {
-            foo: null,
-        });
-
-        expect(element.dataset.foo).to.equal(undefined);
-        expect(element.hasAttribute('data-foo')).to.equal(false);
-
-        attr(element, 'dataset', {
-            bar: undefined,
-        });
-
-        expect(element.dataset.bar).to.equal(undefined);
-        expect(element.hasAttribute('data-bar')).to.equal(false);
-    });
-
-    it('should convert a boolean value to string for dataset', () => {
-        attr(element, 'dataset', {
-            foo: true,
-            baz: false
-        });
-
-        expect(element.dataset.foo).to.equal('true');
-        expect(element.getAttribute('data-foo')).to.equal('true');
-        expect(element.dataset.baz).to.equal('false');
-        expect(element.getAttribute('data-baz')).to.equal('false');
+        expect(element.dataset.a).to.equal('foo');
+        expect(element.dataset.b).to.equal('true');
+        expect(element.dataset.c).to.equal('false');
+        expect(element.dataset.d).to.equal('123');
+        expect(element.dataset.e).to.equal('null');
+        expect(element.dataset.f).to.equal('undefined');
+        expect(element.dataset.g).to.equal(JSON.stringify({foo: 'bar'}));
+        expect(element.dataset.h).to.equal(JSON.stringify([1, 2, 3]));
     });
 
     it('should support thunks for attributes', () => {
@@ -407,31 +379,126 @@ describe('attr', () => {
         expect(thunk2.args[0][1]).to.deep.equal({width: '1px', height: '1px'});
     });
 
-    it('should support thunks for dataset', () => {
+    it('should support thunks for data', () => {
         const thunk1 = sinon.spy(() => {
-            return {foo: 'a', bar: 'b', baz: 'c'};
+            return {
+                a: 'foo',
+                b: true,
+                c: false,
+                d: 123,
+                e: null,
+                f: undefined,
+                g: {foo: 'bar'},
+                h: [1, 2, 3],
+                i: ' ',
+                j: ''
+            };
         });
-        attr(element, 'dataset', thunk1);
+        attr(element, 'data', thunk1);
 
-        expect(element.dataset.foo).to.equal('a');
-        expect(element.dataset.bar).to.equal('b');
-        expect(element.dataset.baz).to.equal('c');
+        expect(element.dataset.a).to.equal('foo');
+        expect(element.dataset.b).to.equal('true');
+        expect(element.dataset.c).to.equal('false');
+        expect(element.dataset.d).to.equal('123');
+        expect(element.dataset.e).to.equal('null');
+        expect(element.dataset.f).to.equal('undefined');
+        expect(element.dataset.g).to.equal(JSON.stringify({foo: 'bar'}));
+        expect(element.dataset.h).to.equal(JSON.stringify([1, 2, 3]));
+        expect(element.dataset.i).to.equal(' ');
+        expect(element.dataset.j).to.equal('');
         expect(thunk1.callCount).to.equal(1);
         expect(thunk1.args[0][0]).to.equal(element);
         expect(thunk1.args[0][1]).to.deep.equal({});
 
         const thunk2 = sinon.spy(() => {
-            return {bar: 'x', baz: 'y', qux: 'z'};
+            return {
+                d: 1234,
+                g: {foo: 'baz'},
+                h: [1, 2, 3, 4, 5],
+                k: 'qux'
+            };
         });
-        attr(element, 'dataset', thunk2);
+        attr(element, 'data', thunk2);
 
-        expect(element.dataset.foo).to.equal('a');
-        expect(element.dataset.bar).to.equal('x');
-        expect(element.dataset.baz).to.equal('y');
-        expect(element.dataset.qux).to.equal('z');
+        expect(element.dataset.a).to.equal('foo');
+        expect(element.dataset.b).to.equal('true');
+        expect(element.dataset.c).to.equal('false');
+        expect(element.dataset.d).to.equal('1234');
+        expect(element.dataset.e).to.equal('null');
+        expect(element.dataset.f).to.equal('undefined');
+        expect(element.dataset.g).to.equal(JSON.stringify({foo: 'baz'}));
+        expect(element.dataset.h).to.equal(JSON.stringify([1, 2, 3, 4, 5]));
+        expect(element.dataset.i).to.equal(' ');
+        expect(element.dataset.j).to.equal('');
+        expect(element.dataset.k).to.equal('qux');
         expect(thunk2.callCount).to.equal(1);
         expect(thunk2.args[0][0]).to.equal(element);
-        expect(thunk2.args[0][1]).to.deep.equal({foo: 'a', bar: 'b', baz: 'c'});
+        expect(thunk2.args[0][1]).to.deep.equal({
+            a: 'foo',
+            b: true,
+            c: false,
+            d: 123,
+            e: null,
+            f: undefined,
+            g: {foo: 'bar'},
+            h: [1, 2, 3],
+            i: ' ',
+            j: ''
+        });
+    });
+
+    it('should not convert numeric strings if it changes its representation', () => {
+        attr(element, 'data', () => {
+            return {
+                a: '5',
+                b: '5.5',
+                c: '5.5E3',
+                d: '5.574E9',
+                e: '0x42',
+                f: '5..5',
+                g: '-.',
+                h: '123456789123456789123456789'
+            };
+        });
+
+        const thunk = sinon.spy(() => ({}));
+        attr(element, 'data', thunk);
+
+        expect(thunk.callCount).to.equal(1);
+        expect(thunk.args[0][0]).to.equal(element);
+        expect(thunk.args[0][1]).to.deep.equal({
+            a: 5,
+            b: 5.5,
+            c: '5.5E3',
+            d: '5.574E9',
+            e: '0x42',
+            f: '5..5',
+            g: '-.',
+            h: '123456789123456789123456789'
+        });
+    });
+
+    it('should not convert invalid JSON', () => {
+        attr(element, 'data', () => {
+            return {
+                a: '{123}',
+                b: '[abc]',
+                c: ' {}',
+                d: '[] '
+            };
+        });
+
+        const thunk = sinon.spy(() => ({}));
+        attr(element, 'data', thunk);
+
+        expect(thunk.callCount).to.equal(1);
+        expect(thunk.args[0][0]).to.equal(element);
+        expect(thunk.args[0][1]).to.deep.equal({
+            a: '{123}',
+            b: '[abc]',
+            c: ' {}',
+            d: '[] '
+        });
     });
 
     it('should support SVG elements', () => {
