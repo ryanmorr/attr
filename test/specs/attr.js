@@ -551,7 +551,7 @@ describe('attr', () => {
         const element = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 
         expect(element.getAttribute('xlink:href')).to.equal(null);
-        attr(element, 'xlink:href', 'foo')
+        attr(element, 'xlink:href', 'foo');
         expect(element.getAttribute('xlink:href')).to.equal('foo');
     });
 
