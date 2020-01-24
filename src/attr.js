@@ -105,7 +105,7 @@ export default function attr(element, name, value) {
         for (const key in value) {
             element.dataset[key] = stringifyData(value[key]);
         }
-    } else if (!isSvg && name in element) {
+    } else if (!isSvg && name !== 'form' && name !== 'list' && name in element) {
         element[name] = value == null ? '' : value;
     } else if (value == null || value === false) {
         element.removeAttribute(name);

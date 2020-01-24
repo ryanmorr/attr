@@ -554,4 +554,18 @@ describe('attr', () => {
         attr(element, 'xlink:href', 'foo')
         expect(element.getAttribute('xlink:href')).to.equal('foo');
     });
+
+    it('should support the input list attribute', () => {
+        const input = document.createElement('input');
+
+        attr(input, 'list', 'foo');
+        expect(input.getAttribute('list')).to.equal('foo');
+    });
+
+    it('should support the input form attribute', () => {
+        const input = document.createElement('input');
+
+        attr(input, 'form', 'foo');
+        expect(input.getAttribute('form')).to.equal('foo');
+    });
 });
