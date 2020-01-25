@@ -1,6 +1,6 @@
 {
-  "name": "attr",
-  "description": "An all-purpose DOM element attribute/property/style/event setter",
+  "name": "@ryanmorr/attr",
+  "description": "The ultimate DOM attribute, property, style, data, and event setter",
   "version": "0.1.0",
   "license": "Unlicense",
   "author": "Ryan Morr",
