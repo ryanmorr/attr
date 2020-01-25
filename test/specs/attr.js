@@ -581,4 +581,26 @@ describe('attr', () => {
         attr(input, 'form', 'foo');
         expect(input.getAttribute('form')).to.equal('foo');
     });
+
+    it('should support innerHTML', () => {
+        attr(element, 'innerHTML', '<span></span>');
+        expect(element.innerHTML).to.equal('<span></span>');
+
+        attr(element, 'innerHTML', null);
+        expect(element.innerHTML).to.equal('');
+    });
+
+    it('should select option elements', () => {
+        element.innerHTML = `
+            <select>
+                <option selected>foo</option>
+                <option>bar</option>
+            </select>
+        `;
+
+        const options = element.querySelectorAll('option');
+        attr(options[1], 'selected', true);
+        expect(options[0].selected).to.equal(false);
+        expect(options[1].selected).to.equal(true);
+    });
 });
