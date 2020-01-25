@@ -243,6 +243,19 @@ describe('attr', () => {
         expect(getStyle(element, 'display')).to.equal(defaultDisplay);
     });
 
+    it('should use pixels for units by default', () => {
+        attr(element, 'style', {
+            width: '2em',
+            gridRowStart: 1,
+            'padding-top': 5,
+            'padding-bottom': '0.7ex',
+            top: 100,
+            left: '100%'
+        });
+
+        expect(element.style.cssText).to.equal('width: 2em; grid-row-start: 1; padding-top: 5px; padding-bottom: 0.7ex; top: 100px; left: 100%;');
+    });
+
     it('should add an event listener', (done) => {
         const event = new MouseEvent('click');
         const onClick = (e) => {
@@ -440,7 +453,7 @@ describe('attr', () => {
                 k: 'qux'
             };
         });
-        attr(element, 'data', thunk2);
+        attr(element, 'dataset', thunk2);
 
         expect(element.dataset.a).to.equal('foo');
         expect(element.dataset.b).to.equal('true');

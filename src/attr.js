@@ -1,4 +1,6 @@
 const JSON_RE = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/;
+const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
+
 const XLINK_NS = 'http://www.w3.org/1999/xlink';
 const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 const NAMESPACES = {
@@ -60,7 +62,7 @@ function getCurrentValue(element, name, isSvg) {
             return styles;
         }, {});
     }
-    if (name === 'data') {
+    if (name === 'data' || name === 'dataset') {
         const data = {};
         for (const prop in element.dataset) {
             data[prop] = parseData(element.dataset[prop]);
@@ -93,7 +95,10 @@ export default function attr(element, name, value) {
             element.style.cssText = value;
         } else {
             for (const key in value) {
-                const style = value[key] == null ? '' : value[key];
+                let style = value[key] == null ? '' : value[key];
+                if (typeof style === 'number' && IS_NON_DIMENSIONAL.test(key) === false) {
+                    style = style + 'px';
+                }
                 if (key.includes('-')) {
                     element.style.setProperty(key, style);
                 } else {
@@ -101,7 +106,7 @@ export default function attr(element, name, value) {
                 }
             }
         }
-    } else if (name === 'data') {
+    } else if (name === 'data' || name === 'dataset') {
         for (const key in value) {
             element.dataset[key] = stringifyData(value[key]);
         }
