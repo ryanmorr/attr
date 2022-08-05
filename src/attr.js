@@ -23,6 +23,27 @@ function stringifyData(data) {
 	return data;
 }
 
+function createClass(obj) {
+    let output = '';
+    if (typeof obj === 'string') {
+        return obj;
+    }
+    if (Array.isArray(obj) && obj.length > 0) {
+        for (let i = 0, len = obj.length, tmp; i < len; i++) {
+            if ((tmp = createClass(obj[i])) !== '') {
+                output += (output && ' ') + tmp;
+            }
+        }
+    } else {
+        for (const cls in obj) {
+            if (obj[cls]) {
+                output += (output && ' ') + cls;
+            }
+        }
+    }
+    return output;
+}
+
 function parseData(data) {
 	if (data === 'true') {
 		return true;
@@ -87,8 +108,8 @@ export default function attr(element, name, value) {
     if (typeof value === 'function') {
         value = value(element, getCurrentValue(element, name, isSvg));
     }
-    if ((name === 'class' || name === 'className') && Array.isArray(value)) {
-        value = value.join(' ');
+    if (value != null && (name === 'class' || name === 'className')) {
+        value = createClass(value);
     }
     if (name === 'style') {
         if (typeof value === 'string') {

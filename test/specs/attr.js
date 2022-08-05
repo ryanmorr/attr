@@ -88,6 +88,16 @@ describe('attr', () => {
         expect(element.className).to.equal('a b c d');
         expect(element.getAttribute('class')).to.equal('a b c d');
     });
+    
+    it('should set the class attribute with an object', () => {
+        attr(element, 'class', {foo: true, bar: false, baz: true});
+        expect(element.className).to.equal('foo baz');
+        expect(element.getAttribute('class')).to.equal('foo baz');
+
+        attr(element, 'className', {foo: false, bar: true, baz: true, qux: true});
+        expect(element.className).to.equal('bar baz qux');
+        expect(element.getAttribute('class')).to.equal('bar baz qux');
+    });
 
     it('should remove the class attribute by providing null or undefined as the value', () => {
         attr(element, 'class', 'foo');
