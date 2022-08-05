@@ -1,8 +1,8 @@
 # attr
 
 [![Version Badge][version-image]][project-url]
-[![Build Status][build-image]][build-url]
 [![License][license-image]][license-url]
+[![Build Status][build-image]][build-url]
 
 > The ultimate DOM attribute, property, style, data, and event setter
 
@@ -119,8 +119,8 @@ element.dataset.foo; //=> "[1,3]"
 This project is dedicated to the public domain as described by the [Unlicense](http://unlicense.org/).
 
 [project-url]: https://github.com/ryanmorr/attr
-[version-image]: https://badge.fury.io/gh/ryanmorr%2Fattr.svg
-[build-url]: https://travis-ci.org/ryanmorr/attr
-[build-image]: https://travis-ci.org/ryanmorr/attr.svg
-[license-image]: https://img.shields.io/badge/license-Unlicense-blue.svg
+[version-image]: https://img.shields.io/github/package-json/v/ryanmorr/attr?color=blue&style=flat-square
+[build-url]: https://travis-ci.com/github/ryanmorr/attr
+[build-image]: https://img.shields.io/travis/com/ryanmorr/attr?style=flat-square
+[license-image]: https://img.shields.io/github/license/ryanmorr/attr?color=blue&style=flat-square
 [license-url]: UNLICENSE
