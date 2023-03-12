@@ -1,20 +1,5 @@
 const JSON_RE = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/;
-const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
-
-const XLINK_NS = 'http://www.w3.org/1999/xlink';
-const XML_NS = 'http://www.w3.org/XML/1998/namespace';
-const NAMESPACES = {
-    'xlink:actuate': XLINK_NS,
-    'xlink:arcrole': XLINK_NS,
-    'xlink:href': XLINK_NS,
-    'xlink:role': XLINK_NS,
-    'xlink:show': XLINK_NS,
-    'xlink:title': XLINK_NS,
-    'xlink:type': XLINK_NS,
-    'xml:base': XML_NS,
-    'xml:lang': XML_NS,
-    'xml:space': XML_NS
-};
+const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
 
 function stringifyData(data) {
 	if (typeof data === 'object') {
@@ -71,9 +56,6 @@ function parseData(data) {
 }
 
 function getCurrentValue(element, name, isSvg) {
-    if (name === 'class' || name === 'className') {
-        return element.getAttribute('class');
-    }
     if (name === 'style') {
         return element.style.cssText.split(';').reduce((styles, style) => {
             if (style) {
@@ -90,10 +72,27 @@ function getCurrentValue(element, name, isSvg) {
         }
         return data;
     }
-    if (!isSvg && name in element) {
-        return element[name];
+    if (!isSvg) {
+        if (name === 'class' || name === 'className') {
+            return element.getAttribute('class');
+        }
+        if (name in element) {
+            return element[name];
+        }
     }
     return element.getAttribute(name);
+}
+
+function setStyle(element, name, value) {
+    if (name.startsWith('--')) {
+        element.style.setProperty(name, value == null ? '' : value);
+    } else if (value == null) {
+        element.style[name] = '';
+    } else if (typeof value != 'number' || IS_NON_DIMENSIONAL.test(name)) {
+        element.style[name] = value;
+    } else {
+        element.style[name] = value + 'px';
+    }
 }
 
 export default function attr(element, name, value) {
@@ -101,7 +100,8 @@ export default function attr(element, name, value) {
         return Object.keys(name).forEach((key) => attr(element, key, name[key]));
     }
     if (name.startsWith('on')) {
-        element.addEventListener(name.slice(2).toLowerCase(), value);
+        name = (name.toLowerCase() in element) ? name.toLowerCase().slice(2) : name.slice(2);
+        element.addEventListener(name, value);
         return;
     }
     const isSvg = element instanceof SVGElement;
@@ -116,28 +116,34 @@ export default function attr(element, name, value) {
             element.style.cssText = value;
         } else {
             for (const key in value) {
-                let style = value[key] == null ? '' : value[key];
-                if (typeof style === 'number' && IS_NON_DIMENSIONAL.test(key) === false) {
-                    style = style + 'px';
-                }
-                if (key.includes('-')) {
-                    element.style.setProperty(key, style);
-                } else {
-                    element.style[key] = style;
-                }
+                setStyle(element, key, value[key]);
             }
         }
     } else if (name === 'data' || name === 'dataset') {
         for (const key in value) {
             element.dataset[key] = stringifyData(value[key]);
         }
-    } else if (!isSvg && name !== 'form' && name !== 'list' && name in element) {
-        element[name] = value == null ? '' : value;
-    } else if (value == null || value === false) {
-        element.removeAttribute(name);
-    } else if (isSvg && name in NAMESPACES) {
-        element.setAttributeNS(NAMESPACES[name], name, value);
     } else {
-        element.setAttribute(name, value);
+        if (
+            !isSvg &&
+            name !== 'width' &&
+            name !== 'height' &&
+            name !== 'href' &&
+            name !== 'list' &&
+            name !== 'form' &&
+            name !== 'tabIndex' &&
+            name !== 'download' &&
+            name in element
+        ) {
+            try {
+                element[name] = value == null ? '' : value;
+                return;
+            } catch (e) {} // eslint-disable-line no-empty
+        }
+        if (value != null && (value !== false || name.indexOf('-') != -1)) {
+            element.setAttribute(name, value);
+        } else {
+            element.removeAttribute(name);
+        }
     }
 }

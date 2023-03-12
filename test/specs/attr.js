@@ -99,6 +99,12 @@ describe('attr', () => {
         expect(element.getAttribute('class')).to.equal('bar baz qux');
     });
 
+    it('should alias className to class', () => {
+        attr(element, 'className', 'foo');
+        
+        expect(element.className).to.equal('foo');
+    });
+
     it('should remove the class attribute by providing null or undefined as the value', () => {
         attr(element, 'class', 'foo');
         expect(element.hasAttribute('class')).to.equal(true);
@@ -231,6 +237,13 @@ describe('attr', () => {
         expect(getStyle(element, '--color')).to.equal('red');
     });
 
+    it('should not add "px" suffix for custom properties', () => {
+        attr(element, 'style', {'--foo': '100px', width: 'var(--foo)'});
+
+        expect(element.style.width).to.equal('var(--foo)');
+        expect(getStyle(element, '--foo')).to.equal('100px');
+    });
+
     it('should remove a CSS style by providing null, undefined, or an empty string as the value', () => {
         const defaultDisplay = getStyle(element, 'display');
 
@@ -317,115 +330,127 @@ describe('attr', () => {
         expect(element.dataset.h).to.equal(JSON.stringify([1, 2, 3]));
     });
 
-    it('should support thunks for attributes', () => {
-        const thunk1 = sinon.spy(() => 'bar');
-        attr(element, 'foo', thunk1);
+    it('should alias dataset to data', () => {
+        attr(element, 'dataset', {
+            a: 'foo',
+            b: true,
+            c: [1, 2, 3]
+        });
 
-        expect(element.getAttribute('foo')).to.equal('bar');
-        expect(thunk1.callCount).to.equal(1);
-        expect(thunk1.args[0][0]).to.equal(element);
-        expect(thunk1.args[0][1]).to.equal(null);
-
-        const thunk2 = sinon.spy(() => 'baz');
-        attr(element, 'foo', thunk2);
-
-        expect(element.getAttribute('foo')).to.equal('baz');
-        expect(thunk2.callCount).to.equal(1);
-        expect(thunk2.args[0][0]).to.equal(element);
-        expect(thunk2.args[0][1]).to.equal('bar');
-
-        const thunk3 = sinon.spy(() => null);
-        attr(element, 'foo', thunk3);
-
-        expect(element.hasAttribute('foo')).to.equal(false);
-        expect(thunk3.callCount).to.equal(1);
-        expect(thunk3.args[0][0]).to.equal(element);
-        expect(thunk3.args[0][1]).to.equal('baz');
+        expect(element.dataset.a).to.equal('foo');
+        expect(element.dataset.b).to.equal('true');
+        expect(element.dataset.c).to.equal(JSON.stringify([1, 2, 3]));
     });
 
-    it('should support thunks for classes', () => {
-        const thunk1 = sinon.spy(() => 'bar');
-        attr(element, 'className', thunk1);
+    it('should support functions for attributes', () => {
+        const callback1 = sinon.spy(() => 'bar');
+        attr(element, 'foo', callback1);
+
+        expect(element.getAttribute('foo')).to.equal('bar');
+        expect(callback1.callCount).to.equal(1);
+        expect(callback1.args[0][0]).to.equal(element);
+        expect(callback1.args[0][1]).to.equal(null);
+
+        const callback2 = sinon.spy(() => 'baz');
+        attr(element, 'foo', callback2);
+
+        expect(element.getAttribute('foo')).to.equal('baz');
+        expect(callback2.callCount).to.equal(1);
+        expect(callback2.args[0][0]).to.equal(element);
+        expect(callback2.args[0][1]).to.equal('bar');
+
+        const callback3 = sinon.spy(() => null);
+        attr(element, 'foo', callback3);
+
+        expect(element.hasAttribute('foo')).to.equal(false);
+        expect(callback3.callCount).to.equal(1);
+        expect(callback3.args[0][0]).to.equal(element);
+        expect(callback3.args[0][1]).to.equal('baz');
+    });
+
+    it('should support functions for classes', () => {
+        const callback1 = sinon.spy(() => 'bar');
+        attr(element, 'className', callback1);
 
         expect(element.className).to.equal('bar');
         expect(element.getAttribute('class')).to.equal('bar');
-        expect(thunk1.callCount).to.equal(1);
-        expect(thunk1.args[0][0]).to.equal(element);
-        expect(thunk1.args[0][1]).to.equal(null);
+        expect(callback1.callCount).to.equal(1);
+        expect(callback1.args[0][0]).to.equal(element);
+        expect(callback1.args[0][1]).to.equal(null);
 
-        const thunk2 = sinon.spy(() => 'baz');
-        attr(element, 'class', thunk2);
+        const callback2 = sinon.spy(() => 'baz');
+        attr(element, 'class', callback2);
 
         expect(element.className).to.equal('baz');
         expect(element.getAttribute('class')).to.equal('baz');
-        expect(thunk2.callCount).to.equal(1);
-        expect(thunk2.args[0][0]).to.equal(element);
-        expect(thunk2.args[0][1]).to.equal('bar');
+        expect(callback2.callCount).to.equal(1);
+        expect(callback2.args[0][0]).to.equal(element);
+        expect(callback2.args[0][1]).to.equal('bar');
     });
 
-    it('should support thunks for boolean attributes', () => {
+    it('should support functions for boolean attributes', () => {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
 
-        const thunk1 = sinon.spy(() => true);
-        attr(checkbox, 'checked', thunk1);
+        const callback1 = sinon.spy(() => true);
+        attr(checkbox, 'checked', callback1);
 
         expect(checkbox.checked).to.equal(true);
-        expect(thunk1.callCount).to.equal(1);
-        expect(thunk1.args[0][0]).to.equal(checkbox);
-        expect(thunk1.args[0][1]).to.equal(false);
+        expect(callback1.callCount).to.equal(1);
+        expect(callback1.args[0][0]).to.equal(checkbox);
+        expect(callback1.args[0][1]).to.equal(false);
 
-        const thunk2 = sinon.spy(() => false);
-        attr(checkbox, 'checked', thunk2);
+        const callback2 = sinon.spy(() => false);
+        attr(checkbox, 'checked', callback2);
 
         expect(checkbox.checked).to.equal(false);
-        expect(thunk2.callCount).to.equal(1);
-        expect(thunk2.args[0][0]).to.equal(checkbox);
-        expect(thunk2.args[0][1]).to.equal(true);
+        expect(callback2.callCount).to.equal(1);
+        expect(callback2.args[0][0]).to.equal(checkbox);
+        expect(callback2.args[0][1]).to.equal(true);
     });
 
-    it('should support thunks for properties', () => {
+    it('should support functions for properties', () => {
         const input = document.createElement('input');
 
-        const thunk1 = sinon.spy(() => 'foo');
-        attr(input, 'value', thunk1);
+        const callback1 = sinon.spy(() => 'foo');
+        attr(input, 'value', callback1);
 
         expect(input.value).to.equal('foo');
-        expect(thunk1.callCount).to.equal(1);
-        expect(thunk1.args[0][0]).to.equal(input);
-        expect(thunk1.args[0][1]).to.equal('');
+        expect(callback1.callCount).to.equal(1);
+        expect(callback1.args[0][0]).to.equal(input);
+        expect(callback1.args[0][1]).to.equal('');
 
-        const thunk2 = sinon.spy(() => 'bar');
-        attr(input, 'value', thunk2);
+        const callback2 = sinon.spy(() => 'bar');
+        attr(input, 'value', callback2);
 
         expect(input.value).to.equal('bar');
-        expect(thunk2.callCount).to.equal(1);
-        expect(thunk2.args[0][0]).to.equal(input);
-        expect(thunk2.args[0][1]).to.equal('foo');
+        expect(callback2.callCount).to.equal(1);
+        expect(callback2.args[0][0]).to.equal(input);
+        expect(callback2.args[0][1]).to.equal('foo');
     });
 
-    it('should support thunks for styles', () => {
-        const thunk1 = sinon.spy(() => 'width: 1px; height: 1px;');
-        attr(element, 'style', thunk1);
+    it('should support functions for styles', () => {
+        const callback1 = sinon.spy(() => 'width: 1px; height: 1px;');
+        attr(element, 'style', callback1);
 
         expect(element.style.cssText).to.equal('width: 1px; height: 1px;');
-        expect(thunk1.callCount).to.equal(1);
-        expect(thunk1.args[0][0]).to.equal(element);
-        expect(thunk1.args[0][1]).to.deep.equal({});
+        expect(callback1.callCount).to.equal(1);
+        expect(callback1.args[0][0]).to.equal(element);
+        expect(callback1.args[0][1]).to.deep.equal({});
 
-        const thunk2 = sinon.spy(() => {
+        const callback2 = sinon.spy(() => {
             return {width: '2px', height: '2px'};
         });
-        attr(element, 'style', thunk2);
+        attr(element, 'style', callback2);
 
         expect(element.style.cssText).to.equal('width: 2px; height: 2px;');
-        expect(thunk2.callCount).to.equal(1);
-        expect(thunk2.args[0][0]).to.equal(element);
-        expect(thunk2.args[0][1]).to.deep.equal({width: '1px', height: '1px'});
+        expect(callback2.callCount).to.equal(1);
+        expect(callback2.args[0][0]).to.equal(element);
+        expect(callback2.args[0][1]).to.deep.equal({width: '1px', height: '1px'});
     });
 
-    it('should support thunks for data', () => {
-        const thunk1 = sinon.spy(() => {
+    it('should support functions for data', () => {
+        const callback1 = sinon.spy(() => {
             return {
                 a: 'foo',
                 b: true,
@@ -439,7 +464,7 @@ describe('attr', () => {
                 j: ''
             };
         });
-        attr(element, 'data', thunk1);
+        attr(element, 'data', callback1);
 
         expect(element.dataset.a).to.equal('foo');
         expect(element.dataset.b).to.equal('true');
@@ -451,11 +476,11 @@ describe('attr', () => {
         expect(element.dataset.h).to.equal(JSON.stringify([1, 2, 3]));
         expect(element.dataset.i).to.equal(' ');
         expect(element.dataset.j).to.equal('');
-        expect(thunk1.callCount).to.equal(1);
-        expect(thunk1.args[0][0]).to.equal(element);
-        expect(thunk1.args[0][1]).to.deep.equal({});
+        expect(callback1.callCount).to.equal(1);
+        expect(callback1.args[0][0]).to.equal(element);
+        expect(callback1.args[0][1]).to.deep.equal({});
 
-        const thunk2 = sinon.spy(() => {
+        const callback2 = sinon.spy(() => {
             return {
                 d: 1234,
                 g: {foo: 'baz'},
@@ -463,7 +488,7 @@ describe('attr', () => {
                 k: 'qux'
             };
         });
-        attr(element, 'dataset', thunk2);
+        attr(element, 'dataset', callback2);
 
         expect(element.dataset.a).to.equal('foo');
         expect(element.dataset.b).to.equal('true');
@@ -476,9 +501,9 @@ describe('attr', () => {
         expect(element.dataset.i).to.equal(' ');
         expect(element.dataset.j).to.equal('');
         expect(element.dataset.k).to.equal('qux');
-        expect(thunk2.callCount).to.equal(1);
-        expect(thunk2.args[0][0]).to.equal(element);
-        expect(thunk2.args[0][1]).to.deep.equal({
+        expect(callback2.callCount).to.equal(1);
+        expect(callback2.args[0][0]).to.equal(element);
+        expect(callback2.args[0][1]).to.deep.equal({
             a: 'foo',
             b: true,
             c: false,
@@ -506,12 +531,12 @@ describe('attr', () => {
             };
         });
 
-        const thunk = sinon.spy(() => ({}));
-        attr(element, 'data', thunk);
+        const callback = sinon.spy(() => ({}));
+        attr(element, 'data', callback);
 
-        expect(thunk.callCount).to.equal(1);
-        expect(thunk.args[0][0]).to.equal(element);
-        expect(thunk.args[0][1]).to.deep.equal({
+        expect(callback.callCount).to.equal(1);
+        expect(callback.args[0][0]).to.equal(element);
+        expect(callback.args[0][1]).to.deep.equal({
             a: 5,
             b: 5.5,
             c: '5.5E3',
@@ -533,12 +558,12 @@ describe('attr', () => {
             };
         });
 
-        const thunk = sinon.spy(() => ({}));
-        attr(element, 'data', thunk);
+        const callback = sinon.spy(() => ({}));
+        attr(element, 'data', callback);
 
-        expect(thunk.callCount).to.equal(1);
-        expect(thunk.args[0][0]).to.equal(element);
-        expect(thunk.args[0][1]).to.deep.equal({
+        expect(callback.callCount).to.equal(1);
+        expect(callback.args[0][0]).to.equal(element);
+        expect(callback.args[0][1]).to.deep.equal({
             a: '{123}',
             b: '[abc]',
             c: ' {}',
@@ -558,24 +583,16 @@ describe('attr', () => {
         attr(element, 'class', 'foo');
         expect(element.getAttribute('class')).to.equal('foo');
 
-        const thunk = sinon.spy(() => 'bar');
-        attr(element, 'class', thunk);
+        const callback = sinon.spy(() => 'bar');
+        attr(element, 'class', callback);
 
         expect(element.getAttribute('class')).to.equal('bar');
-        expect(thunk.callCount).to.equal(1);
-        expect(thunk.args[0][0]).to.equal(element);
-        expect(thunk.args[0][1]).to.equal('foo');
+        expect(callback.callCount).to.equal(1);
+        expect(callback.args[0][0]).to.equal(element);
+        expect(callback.args[0][1]).to.equal('foo');
 
         attr(element, 'class', null);
         expect(element.hasAttribute('class')).to.equal(false);
-    });
-
-    it('should support attribute namespaces', () => {
-        const element = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-
-        expect(element.getAttribute('xlink:href')).to.equal(null);
-        attr(element, 'xlink:href', 'foo');
-        expect(element.getAttribute('xlink:href')).to.equal('foo');
     });
 
     it('should support the input list attribute', () => {
@@ -583,13 +600,6 @@ describe('attr', () => {
 
         attr(input, 'list', 'foo');
         expect(input.getAttribute('list')).to.equal('foo');
-    });
-
-    it('should support the input form attribute', () => {
-        const input = document.createElement('input');
-
-        attr(input, 'form', 'foo');
-        expect(input.getAttribute('form')).to.equal('foo');
     });
 
     it('should support innerHTML', () => {
@@ -613,4 +623,149 @@ describe('attr', () => {
         expect(options[0].selected).to.equal(false);
         expect(options[1].selected).to.equal(true);
     });
+
+    it('should support the form attribute', () => {
+        const form = document.createElement('form');
+        form.id = 'foo';
+        const input = document.createElement('input');
+        form.appendChild(input);
+        document.body.appendChild(form);
+
+        attr(input, 'form', 'foo');
+
+		expect(input).to.have.property('form', form);
+
+        document.body.removeChild(form);
+	});
+
+    it('should support the download attribute', () => {
+		attr(element, 'download', '');
+
+		expect(element.getAttribute('download')).to.equal('');
+
+		attr(element, 'download', null);
+
+		expect(element.getAttribute('download')).to.equal(null);
+	});
+
+    it('should clear falsy input values', () => {
+        const input = document.createElement('input');
+
+        attr(input, 'value', 0);
+        expect(input).to.have.property('value', '0');
+
+        attr(input, 'value', false);
+        expect(input).to.have.property('value', 'false');
+
+        attr(input, 'value', null);
+        expect(input).to.have.property('value', '');
+
+        attr(input, 'value', undefined);
+		expect(input).to.have.property('value', '');
+	});
+
+    it('should support falsy DOM properties', () => {
+        const input = document.createElement('input');
+        const table = document.createElement('table');
+
+        attr(input, 'value', false);
+        attr(table, 'border', false);
+
+        expect(input.outerHTML).to.equal('<input>');
+        expect(table.outerHTML).to.equal('<table border="false"></table>');
+
+        attr(input, 'value', null);
+        attr(table, 'border', null);
+
+        expect(input.outerHTML).to.equal('<input>');
+        expect(table.outerHTML).to.equal('<table border=""></table>');
+
+        attr(input, 'value', undefined);
+        attr(table, 'border', undefined);
+
+        expect(input.outerHTML).to.equal('<input>');
+        expect(table.outerHTML).to.equal('<table border=""></table>');
+    });
+
+    it('should set an enumerable boolean attribute', () => {
+        const input = document.createElement('input');
+
+        attr(input, 'spellcheck', false);
+
+		expect(input.spellcheck).to.equal(false);
+	});
+
+    it('should support false string aria attributes', () => {
+        attr(element, 'aria-checked', 'false');
+
+		expect(element.getAttribute('aria-checked')).to.equal('false');
+	});
+
+	it('should support false aria attributes', () => {
+		attr(element, 'aria-checked', false);
+
+		expect(element.getAttribute('aria-checked')).to.equal('false');
+	});
+
+	it('should support false data attributes', () => {
+		attr(element, 'data-checked', false);
+
+		expect(element.getAttribute('data-checked')).to.equal('false');
+	});
+
+	it('should set checked attribute on custom elements without checked property', () => {
+        const el = document.createElement('foo-bar');
+
+        attr(el, 'checked', true);
+
+		expect(el.outerHTML).to.equal('<foo-bar checked="true"></foo-bar>');
+	});
+
+	it('should set value attribute on custom elements without value property', () => {
+        const el = document.createElement('foo-bar');
+
+        attr(el, 'value', 'test');
+
+		expect(el.outerHTML).to.equal('<foo-bar value="test"></foo-bar>');
+	});
+
+	it('should mask value on password input elements', () => {
+        const input = document.createElement('input');
+
+        attr(input, 'type', 'password');
+        attr(input, 'value', 'foo');
+
+		expect(input.outerHTML).to.equal('<input type="password">');
+	});
+
+	it('should unset href if null or undefined', () => {
+        const anchor = document.createElement('a');
+
+        attr(anchor, 'href', '#');
+        expect(anchor.hasAttribute('href')).to.equal(true);
+
+        attr(anchor, 'href', null);
+        expect(anchor.hasAttribute('href')).to.equal(false);
+
+        attr(anchor, 'href', undefined);
+        expect(anchor.hasAttribute('href')).to.equal(false);
+
+        attr(anchor, 'href', '');
+        expect(anchor.hasAttribute('href')).to.equal(true);
+	});
+
+    it('should not set tagName', () => {
+		expect(() => attr(element, 'tagName', 'span')).not.to.throw();
+	});
+
+    it('should not throw when setting size to an invalid value', () => {
+        const input = document.createElement('input');
+        document.body.appendChild(input);
+
+		expect(() => attr(input, 'size', null)).to.not.throw();
+		expect(() => attr(input, 'size', undefined)).to.not.throw();
+		expect(() => attr(input, 'size', 0)).to.not.throw();
+
+        document.body.removeChild(input);
+	});
 });
