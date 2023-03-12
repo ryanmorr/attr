@@ -66,13 +66,13 @@ attr(element, 'style', {
 });
 ```
 
-Supports CSS custom properties:
+Set CSS custom properties:
 
 ``` javascript
 attr(element, 'style', 'color: var(--color)');
 
-attr(element, '--color', 'red');
-attr(element, '--color', 'blue');
+attr(element, 'style', '--color: red');
+attr(element, 'style', {'--color': 'blue'});
 ```
 
 Add an event listener:
@@ -103,7 +103,7 @@ element.className; //=> "foo bar baz"
 attr(element, 'class', (el, value) => value.split(' ').filter(cls => cls !== 'bar'));
 element.className; //=> "foo baz"
 
-attr(element, 'style', 'width: 100px; height: 100px;');
+attr(element, 'style', {width: 100, height: 100});
 element.style.cssText; //=> "width: 100px; height: 100px"
 attr(element, 'style', (el, value) => Object.assign({}, value, {height: null}));
 element.style.cssText; //=> "width: 100px;"
@@ -120,7 +120,7 @@ This project is dedicated to the public domain as described by the [Unlicense](h
 
 [project-url]: https://github.com/ryanmorr/attr
 [version-image]: https://img.shields.io/github/package-json/v/ryanmorr/attr?color=blue&style=flat-square
-[build-url]: https://travis-ci.com/github/ryanmorr/attr
-[build-image]: https://img.shields.io/travis/com/ryanmorr/attr?style=flat-square
+[build-url]: https://github.com/ryanmorr/attr/actions
+[build-image]: https://img.shields.io/github/actions/workflow/status/ryanmorr/attr/node.js.yml?style=flat-square
 [license-image]: https://img.shields.io/github/license/ryanmorr/attr?color=blue&style=flat-square
 [license-url]: UNLICENSE
