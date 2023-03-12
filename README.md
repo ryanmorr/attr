@@ -8,7 +8,7 @@
 
 ## Install
 
-Download the [CJS](https://github.com/ryanmorr/attr/raw/master/dist/attr.cjs.js), [ESM](https://github.com/ryanmorr/attr/raw/master/dist/attr.esm.js), [UMD](https://github.com/ryanmorr/attr/raw/master/dist/attr.umd.js) versions or install via NPM:
+Download the [CJS](https://github.com/ryanmorr/attr/raw/master/dist/cjs/attr.js), [ESM](https://github.com/ryanmorr/attr/raw/master/dist/esm/attr.js), [UMD](https://github.com/ryanmorr/attr/raw/master/dist/umd/attr.js) versions or install via NPM:
 
 ``` sh
 npm install @ryanmorr/attr
