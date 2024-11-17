@@ -133,6 +133,9 @@ export default function attr(element, name, value) {
             name !== 'form' &&
             name !== 'tabIndex' &&
             name !== 'download' &&
+            name !== 'rowSpan' &&
+			name !== 'colSpan' &&
+			name !== 'role' &&
             name in element
         ) {
             try {
