@@ -5,8 +5,11 @@
   "license": "Unlicense",
   "author": "Ryan Morr",
   "homepage": "https://github.com/ryanmorr/attr",
-  "repository": "github:ryanmorr/attr",
   "bugs": "https://github.com/ryanmorr/attr/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanmorr/attr.git"
+  },
   "keywords": [
     "javascript",
     "dom",
